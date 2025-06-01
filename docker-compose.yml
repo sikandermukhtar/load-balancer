@@ -1,0 +1,16 @@
+services:
+  load-balancer:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend1
+      - backend2
+  backend1:
+    build: ./server
+    ports:
+      - "8001:8000"
+  backend2:
+    build: ./server
+    ports:
+      - "8002:8000"
