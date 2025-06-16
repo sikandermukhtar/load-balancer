@@ -1,9 +1,23 @@
-FROM golang:1.21 AS builder
-WORKDIR /app
-COPY . .
-RUN go build -o load-balancer main.go
+# Build stage
+FROM golang:1.24.3-alpine AS builder
 
+WORKDIR /app
+
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+COPY . .
+
+RUN go build -o loadbalancer main.go
+
+# Runtime stage
 FROM alpine:latest
-WORKDIR /root/
-COPY --from=builder /app/load-balancer .
-CMD ["./load-balancer"]
+
+WORKDIR /app
+
+COPY --from=builder /app/loadbalancer .
+
+EXPOSE 8080
+
+CMD ["./loadbalancer"]
