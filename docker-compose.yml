@@ -3,14 +3,21 @@ services:
     build: .
     ports:
       - "8080:8080"
+    environment:
+      - BACKENDS=http://backend1:8000,http://backend2:8000,http://backend3:8000
     depends_on:
       - backend1
       - backend2
+      - backend3
   backend1:
     build: ./server
     ports:
-      - "8001:8000"
+      - "8000:8000"  # Maps host port 8000 to container port 8000
   backend2:
     build: ./server
     ports:
-      - "8002:8000"
+      - "8001:8000"  # Maps host port 8001 to container port 8000
+  backend3:
+    build: ./server
+    ports:
+      - "8002:8000"  # Maps host port 8002 to container port 8000
