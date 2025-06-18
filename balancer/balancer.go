@@ -53,7 +53,7 @@ func NewLoadBalancer(algorithm string, backends []string, health *health.HealthC
             ResponseHeaderTimeout: 30 * time.Second,
         }
         proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
-            log.Printf("Proxy error for %s to %s: %v", r.URL, backend, err)
+            // log.Printf("Proxy error for %s to %s: %v", r.URL, backend, err)
             http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
         }
         proxy.Director = func(req *http.Request) {
@@ -61,12 +61,13 @@ func NewLoadBalancer(algorithm string, backends []string, health *health.HealthC
             req.URL.Host = u.Host
             req.Host = u.Host // Explicitly set the Host header
             // Simplify path handling to avoid artifacts like "/."
-            req.URL.Path = path.Clean(req.URL.Path)
-            if req.URL.Path == "" || req.URL.Path == "." {
-                req.URL.Path = "/"
-            }
+            // req.URL.Path = path.Clean(req.URL.Path)
+            // if req.URL.Path == "" || req.URL.Path == "." {
+            //     req.URL.Path = "/"
+            // }
+            req.URL.Path = "/users"
             // Log the full request for debugging
-            log.Printf("Proxying request: %s %s Headers: %+v", req.Method, req.URL.String(), req.Header)
+            // log.Printf("Proxying request: %s %s Headers: %+v", req.Method, req.URL.String(), req.Header)
         }
         proxyCache[backend] = proxy
     }
@@ -80,6 +81,9 @@ func NewLoadBalancer(algorithm string, backends []string, health *health.HealthC
 }
 
 func (lb *LoadBalancer) Balance(w http.ResponseWriter, r *http.Request) {
+
+    // w.WriteHeader(http.StatusOK)
+
 	healthyBackends := lb.getHealthyBackends()
 	if len(healthyBackends) == 0 {
 		log.Println("No healthy backends available")
@@ -89,11 +93,11 @@ func (lb *LoadBalancer) Balance(w http.ResponseWriter, r *http.Request) {
 	selected := lb.strategy.Select(r, healthyBackends)
 	proxy, exists := lb.proxyCache[selected]
 	if !exists {
-		log.Printf("No proxy found for backend %s", selected)
+		// log.Printf("No proxy found for backend %s", selected)
 		http.Error(w, "Invalid backend", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("Forwarding request %s to %s", r.URL, selected)
+	// log.Printf("Forwarding request %s to %s", r.URL, selected)
 	proxy.ServeHTTP(w, r)
 }
 
