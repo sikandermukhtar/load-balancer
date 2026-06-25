@@ -1,3 +1,4 @@
+```text
 load-balancer/
 ├── go.mod
 ├── go.sum
@@ -24,8 +25,7 @@ load-balancer/
 ├── Dockerfile              # Dockerfile for the load balancer
 ├── docker-compose.yml      # Compose file to run balancer + FastAPI backends
 └── README.md
-
-
+```
 
 | File/Folder                         | Description                                                   |
 | ----------------------------------- | ------------------------------------------------------------- |
@@ -41,6 +41,3 @@ load-balancer/
 
 
 
-```bash
-deactivate
-```
